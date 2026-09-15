@@ -3,6 +3,12 @@
   "name": "ALPHA LIVE",
   "version": "1.0.0",
   "description": "浏览器直接连接 DEX Screener Profile WebSocket。",
+  "icons": {
+    "16": "image/logo.png",
+    "32": "image/logo.png",
+    "48": "image/logo.png",
+    "128": "image/logo.png"
+  },
   "action": { "default_title": "打开 ALPHA LIVE" },
   "permissions": ["sidePanel"],
   "side_panel": { "default_path": "dashboard.html" },

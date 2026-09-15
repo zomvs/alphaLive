@@ -13,3 +13,7 @@ wss://api.dexscreener.com/token-profiles/latest/v1
 ```
 
 只监控 Token Profile，默认勾选 Robinhood 和 ETH。已读事件保存在 Side Panel 的浏览器本地存储中。
+
+## 隐私政策
+
+https://zomvs.github.io/alphaLive/
