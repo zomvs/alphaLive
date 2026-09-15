@@ -63,8 +63,8 @@ test('renders chain-matched token referral links for selected DEXes', () => {
   assert.match(elements.feed.innerHTML, /href="https:\/\/web3\.binance\.com\/token\/eth\/0xabc%2Fdef\?ref=PZGZ6O5N"/);
 
   elements['dex-picker'].onchange({ target: { type: 'checkbox', checked: true, value: 'debot' } });
-  assert.match(elements.feed.innerHTML, /href="https:\/\/debot\.ai\/token\/robinhood\/RH1"/);
-  assert.match(elements.feed.innerHTML, /href="https:\/\/debot\.ai\/token\/eth\/0xabc%2Fdef"/);
+  assert.match(elements.feed.innerHTML, /href="https:\/\/debot\.ai\/token\/robinhood\/325634_RH1"/);
+  assert.match(elements.feed.innerHTML, /href="https:\/\/debot\.ai\/token\/eth\/325634_0xabc%2Fdef"/);
 
   elements['dex-picker'].onchange({ target: { type: 'checkbox', checked: true, value: 'okx' } });
   assert.match(elements['dex-picker'].innerHTML, /value="okx"/);
@@ -78,7 +78,7 @@ test('renders chain-matched token referral links for selected DEXes', () => {
   assert.match(xlayerRow, /href="https:\/\/web3\.okx\.com\/token\/xlayer\/XL1\?ref=ALPHALIVE"/);
   assert.doesNotMatch(xlayerRow, /dex-action debot/);
 
-  assert.match(elements.feed.innerHTML, /href="https:\/\/debot\.ai\/token\/solana\/SOL1"/);
+  assert.match(elements.feed.innerHTML, /href="https:\/\/debot\.ai\/token\/solana\/325634_SOL1"/);
   assert.match(elements.feed.innerHTML, /href="https:\/\/web3\.okx\.com\/token\/solana\/SOL1\?ref=ALPHALIVE"/);
 
   elements['chain-picker'].onchange({ target: { type: 'checkbox', checked: true, value: 'arbitrum' } });
