@@ -1,0 +1,76 @@
+{
+  "extensionName": {
+    "message": "Alpha Live"
+  },
+  "extensionDescription": {
+    "message": "实时监控 DEX Screener Token Profile 更新，支持多链筛选、声音提醒、合约地址复制及 GMGN、Binance、DeBot、OKX 快捷访问。"
+  },
+  "actionTitle": {
+    "message": "打开 Alpha Live"
+  },
+  "monitorSubtitle": {
+    "message": "DEX 资料监控"
+  },
+  "connecting": {
+    "message": "连接中"
+  },
+  "soundOff": {
+    "message": "关闭提示音"
+  },
+  "soundOn": {
+    "message": "开启提示音"
+  },
+  "chainFilter": {
+    "message": "链"
+  },
+  "dexFilter": {
+    "message": "DEX"
+  },
+  "refresh": {
+    "message": "刷新"
+  },
+  "online": {
+    "message": "在线"
+  },
+  "reconnecting": {
+    "message": "重新连接"
+  },
+  "loadingTitle": {
+    "message": "正在连接 DEX Screener"
+  },
+  "loadingSubtitle": {
+    "message": "等待实时资料事件…"
+  },
+  "emptyTitle": {
+    "message": "暂无匹配资料"
+  },
+  "emptySubtitle": {
+    "message": "请勾选链或等待新的实时 Profile 事件…"
+  },
+  "noneSelected": {
+    "message": "未选择"
+  },
+  "openDex": {
+    "message": "打开 $DEX$",
+    "placeholders": {
+      "dex": {
+        "content": "$1"
+      }
+    }
+  },
+  "openX": {
+    "message": "打开 X"
+  },
+  "openWebsite": {
+    "message": "打开网页"
+  },
+  "markRead": {
+    "message": "标记已读"
+  },
+  "copied": {
+    "message": "已复制"
+  },
+  "reopenHint": {
+    "message": "点击插件图标可再次打开"
+  }
+}

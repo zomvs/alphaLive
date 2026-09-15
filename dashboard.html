@@ -1,46 +1,46 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ALPHA LIVE</title>
+  <title>Alpha Live</title>
   <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
   <main class="shell">
     <header class="topbar">
       <div class="brand-lockup">
-        <img class="brand-mark" src="image/logo.png" alt="ALPHA LIVE">
+        <img class="brand-mark" src="image/logo.png" alt="Alpha Live">
         <div>
-          <div class="brand">ALPHA LIVE</div>
-          <div class="subtitle">DEX PROFILE MONITOR</div>
+          <div class="brand" data-i18n="extensionName">Alpha Live</div>
+          <div class="subtitle" data-i18n="monitorSubtitle">DEX PROFILE MONITOR</div>
         </div>
       </div>
       <div class="header-tools">
-        <button id="sound" class="sound on" title="关闭提示音" aria-label="关闭提示音">
+        <button id="sound" class="sound on" title="Turn off sound" aria-label="Turn off sound" data-i18n-title="soundOff" data-i18n-aria-label="soundOff">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 9.5a4 4 0 0 1 0 5"/><path class="sound-slash" d="m4 4 16 16"/></svg>
         </button>
         <div id="clock" class="clock">--:--:--</div>
-        <strong id="live" class="live reconnecting"><i></i> CONNECTING</strong>
+        <strong id="live" class="live reconnecting"><i></i> <span data-i18n="connecting">CONNECTING</span></strong>
       </div>
     </header>
 
     <section class="workspace">
       <div class="controls">
         <details class="filter-select" id="chain-select">
-          <summary><span class="filter-icon" title="Chain" aria-label="Chain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="m8.2 7.2 2.4 8.1M15.8 7.2l-2.4 8.1M8.5 6h7"/></svg></span><span id="chain-summary" class="filter-summary">RH · ETH</span></summary>
+          <summary><span class="filter-icon" title="Chain" aria-label="Chain" data-i18n-title="chainFilter" data-i18n-aria-label="chainFilter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="m8.2 7.2 2.4 8.1M15.8 7.2l-2.4 8.1M8.5 6h7"/></svg></span><span id="chain-summary" class="filter-summary">RH · ETH</span></summary>
           <div class="filter-picker" id="chain-picker"></div>
         </details>
         <details class="filter-select" id="dex-select">
-          <summary><span class="filter-icon dex-icon" title="DEX" aria-label="DEX"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 8v8l-9 5-9-5V8l9-5Z"/><path d="m8 12 3 3 5-6"/></svg></span><span id="dex-summary" class="filter-summary">GMGN</span></summary>
+          <summary><span class="filter-icon dex-icon" title="DEX" aria-label="DEX" data-i18n-title="dexFilter" data-i18n-aria-label="dexFilter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 8v8l-9 5-9-5V8l9-5Z"/><path d="m8 12 3 3 5-6"/></svg></span><span id="dex-summary" class="filter-summary">GMGN</span></summary>
           <div class="filter-picker" id="dex-picker"></div>
         </details>
-        <button id="refresh" class="refresh" title="刷新" aria-label="刷新"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.7-4L4 9"/><path d="M4 4v5h5"/><path d="M4 13a8 8 0 0 0 14.7 4L20 15"/><path d="M20 20v-5h-5"/></svg></button>
+        <button id="refresh" class="refresh" title="Refresh" aria-label="Refresh" data-i18n-title="refresh" data-i18n-aria-label="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.7-4L4 9"/><path d="M4 4v5h5"/><path d="M4 13a8 8 0 0 0 14.7 4L20 15"/><path d="M20 20v-5h-5"/></svg></button>
       </div>
-      <div class="feed" id="feed"><div class="empty">正在连接 DEX Screener<span>等待实时资料事件…</span></div></div>
+      <div class="feed" id="feed"><div class="empty"><div data-i18n="loadingTitle">Connecting to DEX Screener</div><span data-i18n="loadingSubtitle">Waiting for live profile events…</span></div></div>
     </section>
 
-    <footer><span>点击插件图标可再次打开</span></footer>
+    <footer><span data-i18n="reopenHint">Click the extension icon to reopen</span></footer>
   </main>
   <script src="dashboard.js"></script>
 </body>

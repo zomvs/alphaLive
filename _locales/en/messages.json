@@ -1,0 +1,76 @@
+{
+  "extensionName": {
+    "message": "Alpha Live"
+  },
+  "extensionDescription": {
+    "message": "Monitor DEX Screener Token Profile updates with multi-chain filters, sound alerts, address copying, and quick DEX links."
+  },
+  "actionTitle": {
+    "message": "Open Alpha Live"
+  },
+  "monitorSubtitle": {
+    "message": "DEX PROFILE MONITOR"
+  },
+  "connecting": {
+    "message": "CONNECTING"
+  },
+  "soundOff": {
+    "message": "Turn off sound"
+  },
+  "soundOn": {
+    "message": "Turn on sound"
+  },
+  "chainFilter": {
+    "message": "Chain"
+  },
+  "dexFilter": {
+    "message": "DEX"
+  },
+  "refresh": {
+    "message": "Refresh"
+  },
+  "online": {
+    "message": "ONLINE"
+  },
+  "reconnecting": {
+    "message": "RECONNECTING"
+  },
+  "loadingTitle": {
+    "message": "Connecting to DEX Screener"
+  },
+  "loadingSubtitle": {
+    "message": "Waiting for live profile events…"
+  },
+  "emptyTitle": {
+    "message": "No matching profiles"
+  },
+  "emptySubtitle": {
+    "message": "Select chains or wait for new live profile events…"
+  },
+  "noneSelected": {
+    "message": "None"
+  },
+  "openDex": {
+    "message": "Open $DEX$",
+    "placeholders": {
+      "dex": {
+        "content": "$1"
+      }
+    }
+  },
+  "openX": {
+    "message": "Open X"
+  },
+  "openWebsite": {
+    "message": "Open website"
+  },
+  "markRead": {
+    "message": "Mark as read"
+  },
+  "copied": {
+    "message": "Copied"
+  },
+  "reopenHint": {
+    "message": "Click the extension icon to reopen"
+  }
+}

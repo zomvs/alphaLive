@@ -1,15 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "ALPHA LIVE",
+  "name": "__MSG_extensionName__",
   "version": "1.0.0",
-  "description": "浏览器直接连接 DEX Screener Profile WebSocket。",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
   "icons": {
     "16": "image/logo.png",
     "32": "image/logo.png",
     "48": "image/logo.png",
     "128": "image/logo.png"
   },
-  "action": { "default_title": "打开 ALPHA LIVE" },
+  "action": { "default_title": "__MSG_actionTitle__" },
   "permissions": ["sidePanel"],
   "side_panel": { "default_path": "dashboard.html" },
   "background": { "service_worker": "background.js" },

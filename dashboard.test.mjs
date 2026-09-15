@@ -96,8 +96,8 @@ test('keeps live status and only the reopen hint in the footer', () => {
   const footer = html.match(/<footer[\s\S]*?<\/footer>/)?.[0] ?? '';
 
   assert.doesNotMatch(html, /class="overview"/);
-  assert.match(header, /id="live"/);
-  assert.match(footer, /点击插件图标可再次打开/);
+  assert.match(header, /id="live"[^>]*>[\s\S]*data-i18n="connecting"/);
+  assert.match(footer, /data-i18n="reopenHint"/);
   assert.doesNotMatch(footer, /LIVE PROFILE WATCH|footer-count|未读/);
 });
 
@@ -106,7 +106,9 @@ test('uses the shared logo image for the top brand mark', () => {
   const brandLockup = html.match(/<div class="brand-lockup">[\s\S]*?<\/div>\s*<div class="header-tools">/)?.[0] ?? '';
 
   assert.match(brandLockup, /<img[^>]+src="image\/logo\.png"/);
-  assert.match(brandLockup, /alt="ALPHA LIVE"/);
+  assert.match(brandLockup, /alt="Alpha Live"/);
+  assert.match(brandLockup, /class="brand" data-i18n="extensionName">Alpha Live/);
+  assert.match(brandLockup, /class="subtitle" data-i18n="monitorSubtitle">DEX PROFILE MONITOR/);
 });
 
 test('declares the shared logo image as the extension icon', () => {
@@ -118,6 +120,122 @@ test('declares the shared logo image as the extension icon', () => {
     "48": "image/logo.png",
     "128": "image/logo.png",
   });
+});
+
+test('provides localized extension metadata in English and Simplified Chinese', () => {
+  const manifest = JSON.parse(readFileSync(new URL('manifest.json', import.meta.url), 'utf8'));
+  const readMessages = locale => {
+    try {
+      return JSON.parse(readFileSync(new URL(`_locales/${locale}/messages.json`, import.meta.url), 'utf8'));
+    } catch {
+      return {};
+    }
+  };
+  const english = readMessages('en');
+  const chinese = readMessages('zh_CN');
+
+  assert.equal(manifest.default_locale, 'en');
+  assert.equal(manifest.name, '__MSG_extensionName__');
+  assert.equal(manifest.description, '__MSG_extensionDescription__');
+  assert.equal(manifest.action.default_title, '__MSG_actionTitle__');
+  assert.equal(english.extensionName?.message, 'Alpha Live');
+  assert.equal(chinese.extensionName?.message, 'Alpha Live');
+  assert.match(english.extensionDescription?.message ?? '', /DEX Screener Token Profile/);
+  assert.match(chinese.extensionDescription?.message ?? '', /实时监控 DEX Screener Token Profile/);
+});
+
+test('renders the dashboard in the active Chrome UI language', () => {
+  const runDashboard = locale => {
+    const messages = JSON.parse(readFileSync(new URL(`_locales/${locale}/messages.json`, import.meta.url), 'utf8'));
+    const elements = Object.fromEntries(
+      ['live', 'chain-summary', 'chain-picker', 'dex-summary', 'dex-picker', 'feed', 'refresh', 'sound', 'clock']
+        .map(id => [id, {
+          className: '', innerHTML: '', textContent: '', title: '', dataset: {}, attributes: {},
+          classList: { toggle() {} },
+          setAttribute(name, value) { this.attributes[name] = value; },
+        }]),
+    );
+    elements.refresh.dataset = { i18nTitle: 'refresh', i18nAriaLabel: 'refresh' };
+    elements.sound.dataset = { i18nTitle: 'soundOff', i18nAriaLabel: 'soundOff' };
+    const brand = { textContent: '', dataset: { i18n: 'extensionName' } };
+    const subtitle = { textContent: '', dataset: { i18n: 'monitorSubtitle' } };
+    const connecting = { textContent: '', dataset: { i18n: 'connecting' } };
+    const footer = { textContent: '', dataset: { i18n: 'reopenHint' } };
+    const localizedNodes = [...Object.values(elements), brand, subtitle, connecting, footer];
+    const document = {
+      documentElement: { lang: '' },
+      title: '',
+      addEventListener() {},
+      querySelector: selector => elements[selector.slice(1)],
+      querySelectorAll: selector => localizedNodes.filter(node => {
+        if (selector === '[data-i18n]') return node.dataset.i18n;
+        if (selector === '[data-i18n-title]') return node.dataset.i18nTitle;
+        if (selector === '[data-i18n-aria-label]') return node.dataset.i18nAriaLabel;
+        return false;
+      }),
+    };
+    const chrome = {
+      i18n: {
+        getUILanguage: () => locale === 'zh_CN' ? 'zh-CN' : 'en-US',
+        getMessage: (key, substitutions = []) => {
+          const entry = messages[key];
+          if (!entry) return '';
+          const values = Array.isArray(substitutions) ? substitutions : [substitutions];
+          return Object.entries(entry.placeholders ?? {}).reduce((message, [name, placeholder]) => {
+            const position = Number(placeholder.content.replace(/\D/g, '')) - 1;
+            return message.replaceAll(`$${name.toUpperCase()}$`, values[position] ?? '');
+          }, entry.message);
+        },
+      },
+    };
+
+    class WebSocket {
+      constructor() { WebSocket.instance = this; }
+      close() {}
+    }
+
+    vm.runInNewContext(readFileSync(new URL('dashboard.js', import.meta.url), 'utf8'), {
+      chrome,
+      WebSocket,
+      clearTimeout() {},
+      document,
+      localStorage: { getItem: () => null, setItem() {} },
+      navigator: { clipboard: { writeText: () => Promise.resolve() } },
+      setInterval() {},
+      setTimeout() {},
+    });
+
+    WebSocket.instance.onmessage({ data: JSON.stringify({
+      chainId: 'eth', tokenAddress: '0xabc', symbol: 'Localized', links: [],
+    }) });
+
+    return { brand, connecting, document, elements, footer, subtitle };
+  };
+
+  const english = runDashboard('en');
+  assert.equal(english.document.documentElement.lang, 'en-US');
+  assert.equal(english.document.title, 'Alpha Live');
+  assert.equal(english.brand.textContent, 'Alpha Live');
+  assert.equal(english.subtitle.textContent, 'DEX PROFILE MONITOR');
+  assert.equal(english.connecting.textContent, 'CONNECTING');
+  assert.equal(english.footer.textContent, 'Click the extension icon to reopen');
+  assert.equal(english.elements.sound.title, 'Turn off sound');
+  assert.match(english.elements.live.innerHTML, /RECONNECTING/);
+  assert.match(english.elements.feed.innerHTML, /Open GMGN/);
+  assert.match(english.elements.feed.innerHTML, /Mark as read/);
+  english.elements.sound.onclick();
+  assert.equal(english.elements.sound.title, 'Turn on sound');
+
+  const chinese = runDashboard('zh_CN');
+  assert.equal(chinese.document.documentElement.lang, 'zh-CN');
+  assert.equal(chinese.brand.textContent, 'Alpha Live');
+  assert.equal(chinese.subtitle.textContent, 'DEX 资料监控');
+  assert.equal(chinese.connecting.textContent, '连接中');
+  assert.equal(chinese.footer.textContent, '点击插件图标可再次打开');
+  assert.equal(chinese.elements.sound.title, '关闭提示音');
+  assert.match(chinese.elements.live.innerHTML, /重新连接/);
+  assert.match(chinese.elements.feed.innerHTML, /打开 GMGN/);
+  assert.match(chinese.elements.feed.innerHTML, /标记已读/);
 });
 
 test('does not draw a second divider above the controls', () => {
