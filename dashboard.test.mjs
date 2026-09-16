@@ -3,6 +3,81 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
 
+test('renders the CA-resolved token symbol instead of its name', async () => {
+  const elements = Object.fromEntries(
+    ['live', 'chain-summary', 'chain-picker', 'dex-summary', 'dex-picker', 'feed', 'refresh', 'sound', 'clock']
+      .map(id => [id, {
+        className: '', innerHTML: '', textContent: '', title: '',
+        classList: { toggle() {} },
+        setAttribute() {},
+      }]),
+  );
+  let requestedUrl = '';
+
+  class WebSocket {
+    constructor() { WebSocket.instance = this; }
+    close() {}
+  }
+
+  const fetch = async url => {
+    requestedUrl = url;
+    return {
+      ok: true,
+      json: async () => [{
+        chainId: 'robinhood',
+        dexId: 'example',
+        url: 'https://dexscreener.com/ethereum/example',
+        pairAddress: '0xPair',
+        labels: [],
+        baseToken: {
+          address: '0x704aC8b6E2070A773795FDA247AdDaF3F76C1014',
+          name: 'Options Market Launchpad',
+          symbol: 'STRIKEPAD',
+        },
+        quoteToken: { address: '0xQuote', name: 'Wrapped Ether', symbol: 'WETH' },
+        priceNative: '1',
+        priceUsd: '1',
+        txns: {},
+        volume: {},
+        priceChange: {},
+        liquidity: {},
+        fdv: 1,
+        marketCap: 1,
+        pairCreatedAt: 1,
+        info: {},
+      }],
+    };
+  };
+
+  vm.runInNewContext(readFileSync(new URL('dashboard.js', import.meta.url), 'utf8'), {
+    fetch,
+    WebSocket,
+    clearTimeout() {},
+    document: {
+      addEventListener() {},
+      querySelector: selector => elements[selector.slice(1)],
+      querySelectorAll: () => [],
+    },
+    localStorage: { getItem: () => null, setItem() {} },
+    navigator: { clipboard: { writeText: () => Promise.resolve() } },
+    setInterval() {},
+    setTimeout() {},
+  });
+
+  WebSocket.instance.onmessage({ data: JSON.stringify({
+    chainId: 'robinhood',
+    tokenAddress: '0x704ac8b6e2070a773795fda247addaf3f76c1014',
+    symbol: 'OLD',
+    links: [],
+  }) });
+  await new Promise(resolve => setImmediate(resolve));
+
+  assert.equal(requestedUrl, 'https://api.dexscreener.com/tokens/v1/robinhood/0x704ac8b6e2070a773795fda247addaf3f76c1014');
+  assert.match(elements.feed.innerHTML, /<div class="token-name">STRIKEPAD<\/div>/);
+  assert.doesNotMatch(elements.feed.innerHTML, /Options Market Launchpad/);
+  assert.doesNotMatch(elements.feed.innerHTML, />OLD</);
+});
+
 test('renders chain-matched token referral links for selected DEXes', () => {
   const elements = Object.fromEntries(
     ['live', 'chain-summary', 'chain-picker', 'dex-summary', 'dex-picker', 'feed', 'refresh', 'sound', 'clock']
