@@ -26,6 +26,15 @@
   "dexFilter": {
     "message": "DEX"
   },
+  "socialFilter": {
+    "message": "Social links"
+  },
+  "websiteFilterLabel": {
+    "message": "Website"
+  },
+  "twitterFilterLabel": {
+    "message": "Twitter"
+  },
   "refresh": {
     "message": "Refresh"
   },

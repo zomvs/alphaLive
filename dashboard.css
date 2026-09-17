@@ -114,6 +114,7 @@ button, summary, label { -webkit-tap-highlight-color: transparent; }
 .filter-select[open] summary { border-color: #b7b8b3; background: var(--soft); }
 .filter-icon { width: 16px; height: 16px; display: inline-flex; color: var(--blue); }
 .filter-icon.dex-icon { color: #d08a25; }
+.filter-icon.social-icon { color: #7a62c7; }
 .filter-icon svg { width: 16px; height: 16px; }
 .filter-summary { font-weight: 650; }
 .filter-picker {

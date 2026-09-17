@@ -26,6 +26,15 @@
   "dexFilter": {
     "message": "DEX"
   },
+  "socialFilter": {
+    "message": "社交链接"
+  },
+  "websiteFilterLabel": {
+    "message": "网站"
+  },
+  "twitterFilterLabel": {
+    "message": "推特"
+  },
   "refresh": {
     "message": "刷新"
   },

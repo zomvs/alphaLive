@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 test('renders the CA-resolved token symbol instead of its name', async () => {
   const elements = Object.fromEntries(
-    ['live', 'chain-summary', 'chain-picker', 'dex-summary', 'dex-picker', 'feed', 'refresh', 'sound', 'clock']
+    ['live', 'chain-summary', 'chain-picker', 'dex-summary', 'dex-picker', 'social-summary', 'social-picker', 'feed', 'refresh', 'sound', 'clock']
       .map(id => [id, {
         className: '', innerHTML: '', textContent: '', title: '',
         classList: { toggle() {} },
@@ -80,7 +80,7 @@ test('renders the CA-resolved token symbol instead of its name', async () => {
 
 test('renders chain-matched token referral links for selected DEXes', () => {
   const elements = Object.fromEntries(
-    ['live', 'chain-summary', 'chain-picker', 'dex-summary', 'dex-picker', 'feed', 'refresh', 'sound', 'clock']
+    ['live', 'chain-summary', 'chain-picker', 'dex-summary', 'dex-picker', 'social-summary', 'social-picker', 'feed', 'refresh', 'sound', 'clock']
       .map(id => [id, {
         className: '', innerHTML: '', textContent: '', title: '',
         classList: { toggle() {} },
@@ -165,6 +165,70 @@ test('renders chain-matched token referral links for selected DEXes', () => {
   assert.doesNotMatch(arbitrumRow, /dex-action binance/);
 });
 
+test('requires every selected social link when filtering profiles', () => {
+  const elements = Object.fromEntries(
+    ['live', 'chain-summary', 'chain-picker', 'dex-summary', 'dex-picker', 'social-summary', 'social-picker', 'feed', 'refresh', 'sound', 'clock']
+      .map(id => [id, {
+        className: '', innerHTML: '', textContent: '', title: '', attributes: {},
+        classList: { toggle(name, enabled) { this[name] = enabled; } },
+        setAttribute(name, value) { this.attributes[name] = value; },
+      }]),
+  );
+
+  class WebSocket {
+    constructor() { WebSocket.instance = this; }
+    close() {}
+  }
+
+  vm.runInNewContext(readFileSync(new URL('dashboard.js', import.meta.url), 'utf8'), {
+    WebSocket,
+    clearTimeout() {},
+    document: {
+      addEventListener() {},
+      querySelector: selector => elements[selector.slice(1)],
+      querySelectorAll: () => [],
+    },
+    localStorage: { getItem: () => null, setItem() {} },
+    navigator: { clipboard: { writeText: () => Promise.resolve() } },
+    setInterval() {},
+    setTimeout() {},
+  });
+
+  WebSocket.instance.onmessage({ data: JSON.stringify([
+    {
+      chainId: 'ethereum', tokenAddress: '0xboth', symbol: 'BothLinks',
+      links: [
+        { type: 'website', label: 'Website', url: 'https://example.com' },
+        { type: 'twitter', label: 'X', url: 'https://x.com/example' },
+      ],
+    },
+    {
+      chainId: 'ethereum', tokenAddress: '0xweb', symbol: 'WebsiteOnly',
+      links: [{ type: 'website', label: 'Website', url: 'https://website.example' }],
+    },
+    {
+      chainId: 'ethereum', tokenAddress: '0xtwitter', symbol: 'TwitterOnly',
+      links: [{ type: 'twitter', label: 'X', url: 'https://x.com/example' }],
+    },
+    { chainId: 'ethereum', tokenAddress: '0xnone', symbol: 'NoSocialLinks', links: [] },
+  ]) });
+
+  assert.match(elements.feed.innerHTML, /BothLinks/);
+  assert.match(elements.feed.innerHTML, /WebsiteOnly/);
+  assert.match(elements.feed.innerHTML, /TwitterOnly/);
+  assert.match(elements.feed.innerHTML, /NoSocialLinks/);
+  assert.equal(typeof elements['social-picker'].onchange, 'function');
+
+  elements['social-picker'].onchange({ target: { type: 'checkbox', checked: true, value: 'website' } });
+  assert.match(elements.feed.innerHTML, /BothLinks/);
+  assert.match(elements.feed.innerHTML, /WebsiteOnly/);
+  assert.doesNotMatch(elements.feed.innerHTML, /TwitterOnly|NoSocialLinks/);
+
+  elements['social-picker'].onchange({ target: { type: 'checkbox', checked: true, value: 'twitter' } });
+  assert.match(elements.feed.innerHTML, /BothLinks/);
+  assert.doesNotMatch(elements.feed.innerHTML, /WebsiteOnly|TwitterOnly|NoSocialLinks/);
+});
+
 test('keeps live status and only the reopen hint in the footer', () => {
   const html = readFileSync(new URL('dashboard.html', import.meta.url), 'utf8');
   const header = html.match(/<header[\s\S]*?<\/header>/)?.[0] ?? '';
@@ -174,6 +238,16 @@ test('keeps live status and only the reopen hint in the footer', () => {
   assert.match(header, /id="live"[^>]*>[\s\S]*data-i18n="connecting"/);
   assert.match(footer, /data-i18n="reopenHint"/);
   assert.doesNotMatch(footer, /LIVE PROFILE WATCH|footer-count|未读/);
+});
+
+test('provides a social-link filter matching the chain and DEX controls', () => {
+  const html = readFileSync(new URL('dashboard.html', import.meta.url), 'utf8');
+  const control = html.match(/<details class="filter-select" id="social-select">[\s\S]*?<\/details>/)?.[0] ?? '';
+
+  assert.match(control, /data-i18n-title="socialFilter"/);
+  assert.match(control, /data-i18n-aria-label="socialFilter"/);
+  assert.match(control, /id="social-summary"/);
+  assert.match(control, /id="social-picker"/);
 });
 
 test('uses the shared logo image for the top brand mark', () => {
@@ -223,7 +297,7 @@ test('renders the dashboard in the active Chrome UI language', () => {
   const runDashboard = locale => {
     const messages = JSON.parse(readFileSync(new URL(`_locales/${locale}/messages.json`, import.meta.url), 'utf8'));
     const elements = Object.fromEntries(
-      ['live', 'chain-summary', 'chain-picker', 'dex-summary', 'dex-picker', 'feed', 'refresh', 'sound', 'clock']
+      ['live', 'chain-summary', 'chain-picker', 'dex-summary', 'dex-picker', 'social-summary', 'social-picker', 'feed', 'refresh', 'sound', 'clock']
         .map(id => [id, {
           className: '', innerHTML: '', textContent: '', title: '', dataset: {}, attributes: {},
           classList: { toggle() {} },
@@ -232,11 +306,15 @@ test('renders the dashboard in the active Chrome UI language', () => {
     );
     elements.refresh.dataset = { i18nTitle: 'refresh', i18nAriaLabel: 'refresh' };
     elements.sound.dataset = { i18nTitle: 'soundOff', i18nAriaLabel: 'soundOff' };
+    const socialIcon = {
+      title: '', dataset: { i18nTitle: 'socialFilter', i18nAriaLabel: 'socialFilter' }, attributes: {},
+      setAttribute(name, value) { this.attributes[name] = value; },
+    };
     const brand = { textContent: '', dataset: { i18n: 'extensionName' } };
     const subtitle = { textContent: '', dataset: { i18n: 'monitorSubtitle' } };
     const connecting = { textContent: '', dataset: { i18n: 'connecting' } };
     const footer = { textContent: '', dataset: { i18n: 'reopenHint' } };
-    const localizedNodes = [...Object.values(elements), brand, subtitle, connecting, footer];
+    const localizedNodes = [...Object.values(elements), socialIcon, brand, subtitle, connecting, footer];
     const document = {
       documentElement: { lang: '' },
       title: '',
@@ -284,7 +362,7 @@ test('renders the dashboard in the active Chrome UI language', () => {
       chainId: 'eth', tokenAddress: '0xabc', symbol: 'Localized', links: [],
     }) });
 
-    return { brand, connecting, document, elements, footer, subtitle };
+    return { brand, connecting, document, elements, footer, socialIcon, subtitle };
   };
 
   const english = runDashboard('en');
@@ -295,6 +373,8 @@ test('renders the dashboard in the active Chrome UI language', () => {
   assert.equal(english.connecting.textContent, 'CONNECTING');
   assert.equal(english.footer.textContent, 'Click the extension icon to reopen');
   assert.equal(english.elements.sound.title, 'Turn off sound');
+  assert.equal(english.socialIcon.title, 'Social links');
+  assert.match(english.elements['social-picker'].innerHTML, />Website<|>Twitter</);
   assert.match(english.elements.live.innerHTML, /RECONNECTING/);
   assert.match(english.elements.feed.innerHTML, /Open GMGN/);
   assert.match(english.elements.feed.innerHTML, /Mark as read/);
@@ -308,6 +388,8 @@ test('renders the dashboard in the active Chrome UI language', () => {
   assert.equal(chinese.connecting.textContent, '连接中');
   assert.equal(chinese.footer.textContent, '点击插件图标可再次打开');
   assert.equal(chinese.elements.sound.title, '关闭提示音');
+  assert.equal(chinese.socialIcon.title, '社交链接');
+  assert.match(chinese.elements['social-picker'].innerHTML, />网站<|>推特</);
   assert.match(chinese.elements.live.innerHTML, /重新连接/);
   assert.match(chinese.elements.feed.innerHTML, /打开 GMGN/);
   assert.match(chinese.elements.feed.innerHTML, /标记已读/);
